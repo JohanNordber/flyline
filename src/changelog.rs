@@ -110,6 +110,12 @@ pub(crate) const CHANGELOG: &str = r#"# Changelog
 - **Inline autosuggestions**: When no history match is found, automatically fall back to tab completions ( configurable via `flyline suggestions --auto-suggest-inline`).
 - **Word-by-word suggestion accept**: Accept inline suggestions word-by-word with `Ctrl+Right` (full word) or `Alt+Right` / `Alt+f` (word part or path segment).
 - **Bug fixes for quoted suggestions**: Fixed escaping issues for completions within quotes and path expansions involving environment variables.
+
+## v1.10.0 (2026-10-17)
+- **Automatically fix failed commands with agent**: Press `Alt+Enter` on an empty prompt (or `Alt+Shift+Enter`) to ask the configured agent to diagnose and fix the last failed command.
+- **Non-Latin keyboard shortcuts**: Keybindings in terminals supporting the kitty keyboard protocol fall back to the base layout key (e.g. `Ctrl+D` on Cyrillic layouts), with support for binding non-ASCII keys.
+- **Parameter expansion styling**: Environment variable names and enclosing braces in `${VAR}` are styled as variables with hover tooltips.
+- **Configurable newline marker**: Added `--set-newline-marker` to customize or disable the marker shown when output lacks a trailing newline.
 "#;
 
 pub(crate) fn pretty_changelog() -> String {
