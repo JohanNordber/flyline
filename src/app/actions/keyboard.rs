@@ -5,7 +5,6 @@ use crate::settings::MouseMode;
 use anyhow::Result;
 use clap_complete::CompletionCandidate;
 use flybuffer::WordDelim;
-use std::collections::HashMap;
 use std::io::IsTerminal;
 use std::ops::Add;
 use std::sync::LazyLock;
@@ -1328,20 +1327,17 @@ fn parse_single_keycode(s: &str) -> Result<KeyCode> {
     }
 }
 
-static MODS_TO_EQUIV_NAMES: LazyLock<HashMap<KeyModifiers, &'static [&'static str]>> =
-    LazyLock::new(|| {
-        HashMap::from([
-            (KeyModifiers::CONTROL, &["ctrl", "control"] as &[&str]),
-            (KeyModifiers::SHIFT, &["shift"] as &[&str]),
-            (KeyModifiers::ALT, &["alt", "option"] as &[&str]),
-            (KeyModifiers::META, &["meta"] as &[&str]),
-            (
-                KeyModifiers::SUPER,
-                &["super", "cmd", "command", "gui", "win"] as &[&str],
-            ),
-            (KeyModifiers::HYPER, &["hyper"] as &[&str]),
-        ])
-    });
+const MODS_TO_EQUIV_NAMES: &[(KeyModifiers, &[&str])] = &[
+    (KeyModifiers::CONTROL, &["ctrl", "control"]),
+    (KeyModifiers::SHIFT, &["shift"]),
+    (KeyModifiers::ALT, &["alt", "option"]),
+    (KeyModifiers::META, &["meta"]),
+    (
+        KeyModifiers::SUPER,
+        &["super", "cmd", "command", "gui", "win"],
+    ),
+    (KeyModifiers::HYPER, &["hyper"]),
+];
 
 /// Parse a single modifier name into a single-bit [`KeyModifiers`] value.
 fn parse_single_modifier(s: &str) -> Result<KeyModifiers> {
@@ -2080,7 +2076,7 @@ pub fn key_sequence_completer(current: &std::ffi::OsStr) -> Vec<CompletionCandid
     let current_lower = current.to_lowercase();
     let mut out = vec![];
 
-    for mod_equivs in MODS_TO_EQUIV_NAMES.values() {
+    for (_, mod_equivs) in MODS_TO_EQUIV_NAMES {
         log::info!(
             "Checking mod_equivs {:?} against used mods {:?}",
             mod_equivs,
@@ -2133,7 +2129,7 @@ pub fn remap_key_completer(current: &std::ffi::OsStr) -> Vec<CompletionCandidate
     let mut out = key_sequence_completer(current);
 
     // 2. Also support remapping standalone modifiers (e.g. "Ctrl", "Alt", "Shift", etc.).
-    for mod_equivs in MODS_TO_EQUIV_NAMES.values() {
+    for (_, mod_equivs) in MODS_TO_EQUIV_NAMES {
         for equiv in *mod_equivs {
             if equiv.to_lowercase().starts_with(&current_lower) {
                 out.push(CompletionCandidate::new(capitalize_first(equiv)));
